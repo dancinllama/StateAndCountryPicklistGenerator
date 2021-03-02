@@ -5,6 +5,9 @@ This Apex class enables State and Country picklists  (if not already enabled), a
 
 Why, you might ask?  Because you can only use State and Country picklist on standard address fields / objects currently.
 
+## Credit Where Credit is Due
+For managing the dependencies / controlling values between the state and country selections, Github user boxfoot  (https://github.com/boxfoot) provided this helpful gist: https://gist.github.com/boxfoot/4166342, which is used in this repository.
+
 ## Use
 
 Deploy to a sandbox <a href="https://githubsfdeploy.herokuapp.com?owner=dancinllama&amp;repo=StateAndCountryPicklistGenerator">
@@ -15,16 +18,16 @@ Once installed, use the developer console or VS Code to execute the following th
 
 ```
 //Create the state and country value sets, and state and country picklist for the "Region_Mapping__c" custom object.
-StateAndCountryPicklistGenerator scPLE = new StateCountryPicklistGenerator('Region_Mapping__c');
+StateAndCountryPicklistGenerator scPLE = new StateAndCountryPicklistGenerator('Region_Mapping__c');
 scPLE.run();
 
 //Use the existing state and country value sets, but create the custom picklist fieldsfor the "Region_Mapping__c" custom object.
-StateAndCountryPicklistGenerator scPLE = new StateCountryPicklistGenerator('Region_Mapping__c');
+StateAndCountryPicklistGenerator scPLE = new StateAndCountryPicklistGenerator('Region_Mapping__c');
 sCPLE.createGlobalValueSet = false;
 scPLE.run();
 
 //Create only the global value set, giving it a unique name.
-StateAndCountryPicklistGenerator scPLE = new StateCountryPicklistGenerator('Region_Mapping__c');
+StateAndCountryPicklistGenerator scPLE = new StateAndCountryPicklistGenerator('Region_Mapping__c');
 scPLE.createCountryField = false;
 scPLE.createStateField = false;
 scPLE.countryValueSetName = 'CustomCountry';
