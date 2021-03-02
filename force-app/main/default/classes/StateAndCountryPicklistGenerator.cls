@@ -1,4 +1,3 @@
-
 public class StateAndCountryPicklistGenerator{
 
     //API name of the sObject containing the to country and state picklists.
@@ -58,8 +57,8 @@ public class StateAndCountryPicklistGenerator{
 
     public void run(){
 
-        List<MetadataService.CustomField> customFields = new List<MetadataService.CustomField>();
         MetadataService.CustomField stateField = new MetadataService.CustomField();
+        MetadataService.CustomField countryField = new MetadataService.CustomField();
         if(this.createStateField){
             stateField.fullName = this.sObjectApiName + '.' + this.stateFieldApiName;
             stateField.label = this.stateFieldLabel;
@@ -71,11 +70,9 @@ public class StateAndCountryPicklistGenerator{
             stateField.valueSet.controllingField = this.countryFieldApiName;
             stateField.valueSet.valueSetName = this.stateValueSetName;
             stateField.valueSet.valueSettings = new List<MetadataService.ValueSettings>();
-            customFields.add(stateField);
         }
 
         if(this.createCountryField){
-            MetadataService.CustomField countryField = new MetadataService.CustomField();
             countryField.fullName = this.sObjectApiName + '.' + this.countryFieldApiName;
             countryField.label = this.countryFieldLabel;
             countryField.type_x = 'Picklist';
@@ -84,7 +81,6 @@ public class StateAndCountryPicklistGenerator{
             countryField.valueSet = new MetadataService.ValueSet();
             countryField.valueSet.restricted = this.countryFieldRestricted;
             countryField.valueSet.valueSetName = this.countryValueSetName;
-            customFields.add(countryField);
         }
 
 
@@ -99,51 +95,55 @@ public class StateAndCountryPicklistGenerator{
 
         List<MetadataService.SaveResult> results = new List<MetadataService.SaveResult>();
 
-        if(this.createGlobalValueSet){
-            MetadataService.GlobalValueSet stateGvs = new MetadataService.GlobalValueSet();
-            stateGvs.fullName = this.stateValueSetName;
-            stateGvs.masterLabel = this.stateValueSetLabel;
-            stateGvs.sorted = true;
-            stateGvs.description = this.stateValueSetDescription;
-            stateGvs.customValue = new List<MetadataService.CustomValue>();
+        MetadataService.GlobalValueSet stateGvs = new MetadataService.GlobalValueSet();
+        stateGvs.fullName = this.stateValueSetName;
+        stateGvs.masterLabel = this.stateValueSetLabel;
+        stateGvs.sorted = true;
+        stateGvs.description = this.stateValueSetDescription;
+        stateGvs.customValue = new List<MetadataService.CustomValue>();
 
-            MetadataService.GlobalValueSet countryGvs = new MetadataService.GlobalValueSet();
-            countryGvs.fullName = this.countryValueSetName;
-            countryGvs.masterLabel = this.countryValueSetLabel;
-            countryGvs.sorted = true;
-            countryGvs.description = this.countryValueSetDescription;
-            countryGvs.customValue = new List<MetadataService.CustomValue>();
+        MetadataService.GlobalValueSet countryGvs = new MetadataService.GlobalValueSet();
+        countryGvs.fullName = this.countryValueSetName;
+        countryGvs.masterLabel = this.countryValueSetLabel;
+        countryGvs.sorted = true;
+        countryGvs.description = this.countryValueSetDescription;
+        countryGvs.customValue = new List<MetadataService.CustomValue>();
 
-            for(Schema.PicklistEntry countryPle : Account.BillingCountryCode.getDescribe().getPicklistValues()){
-                MetadataService.CustomValue countryCv = new MetadataService.CustomValue();
-                countryCv.fullName = countryPle.getValue();
-                countryCv.label = countryPle.getLabel();
-                countryCv.IsActive = countryPle.isActive();
-                countryCv.default_x = countryPle.isDefaultValue();
-                countryGvs.customValue.add(countryCv);
+        for(Schema.PicklistEntry countryPle : Account.BillingCountryCode.getDescribe().getPicklistValues()){
+            MetadataService.CustomValue countryCv = new MetadataService.CustomValue();
+            countryCv.fullName = countryPle.getValue();
+            countryCv.label = countryPle.getLabel();
+            countryCv.IsActive = countryPle.isActive();
+            countryCv.default_x = countryPle.isDefaultValue();
+            countryGvs.customValue.add(countryCv);
 
-                for(PicklistEntryWrapper statePle : controllingMap.get(countryPle.getValue())){
-                    MetadataService.CustomValue stateCv = new MetadataService.CustomValue();
+            for(PicklistEntryWrapper statePle : controllingMap.get(countryPle.getValue())){
+                MetadataService.CustomValue stateCv = new MetadataService.CustomValue();
                 stateCv.fullName = countryPle.getValue() + '_' + statePle.value;
-                    stateCv.label = statePle.label;
-                    stateCv.IsActive = statePle.active;
-                    stateCv.default_x = statePle.defaultValue;
-                    stateGvs.customValue.add(stateCv);
+                stateCv.label = statePle.label;
+                stateCv.IsActive = statePle.active;
+                stateCv.default_x = statePle.defaultValue;
+                stateGvs.customValue.add(stateCv);
 
-                    if(this.createStateField){
-                        MetadataService.ValueSettings vs = new MetadataService.ValueSettings();
-                        vs.valueName = stateCv.fullName;
-                        vs.controllingFieldValue = new List<String>{countryPle.getValue()};
-                        stateField.valueSet.valueSettings.add(vs);
-                    }
+                if(this.createStateField){
+                    MetadataService.ValueSettings vs = new MetadataService.ValueSettings();
+                    vs.valueName = stateCv.fullName;
+                    vs.controllingFieldValue = new List<String>{countryPle.getValue()};
+                    stateField.valueSet.valueSettings.add(vs);
                 }
             }
+        }
 
+        if(this.createGlobalValueSet){
             results.addAll(service.createMetadata(new List<MetadataService.GlobalValueSet>{countryGvs,stateGvs}));
         }
 
-        if(!customFields.isEmpty()){
-            results.addAll(service.createMetadata(customFields));
+        if(this.createCountryField){
+            results.addAll(service.createMetadata(new List<MetadataService.CustomField>{ countryField }));
+        }
+
+        if(this.createStateField){
+            results.addAll(service.createMetadata(new List<MetadataService.CustomField>{ stateField }));
         }
 
         for(MetadataService.SaveResult result : results){
