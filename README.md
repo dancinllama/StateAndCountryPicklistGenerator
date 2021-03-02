@@ -9,7 +9,7 @@ Why, you might ask?  Because you can only use State and Country picklist on stan
 
 Deploy to a sandbox <a href="https://githubsfdeploy.herokuapp.com?owner=dancinllama&amp;repo=StateAndCountryPicklistGenerator">
   <img src="https://raw.githubusercontent.com/afawcett/githubsfdeploy/master/src/main/webapp/resources/img/deploy.png" alt="Deploy to Salesforce" />
-</a> Or Deploy to a Salesforce DX scratch org [![Deploy](https://deploy-to-sfdx.com/dist/assets/images/DeployToSFDX.svg)](https://deploy-to-sfdx.com/)
+</a> Or Deploy to a Salesforce DX scratch org.
 
 Once installed, use the developer console or VS Code to execute the following through Execute Anonymous:
 
